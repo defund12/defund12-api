@@ -1,4 +1,5 @@
 import Joi = require("@hapi/joi");
+import Lob = require("./lob");
 
 export const addressSchema = Joi.object({
   name: Joi.string().required(),
@@ -19,20 +20,9 @@ export const startPaymentRequestSchema = Joi.object({
   test: Joi.bool().default(false),
 });
 
-export type Address = {
-  name: string;
-  address_line1: string;
-  address_line2?: string;
-  address_city: string;
-  address_state: string;
-  address_zip: string;
-  address_country?: string;
-  email?: string;
-};
-
 export type StartPaymentRequestType = {
-  fromAddress: Address,
-  toAddresses: Address[],
+  fromAddress: Lob.Address,
+  toAddresses: Lob.Address[],
   body: string,
   email: string,
   test: boolean,
