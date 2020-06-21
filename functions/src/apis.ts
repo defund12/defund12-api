@@ -1,3 +1,7 @@
+/** Load the runtime configs from firebase and turn them into
+ * api service objects, one for test orders and one for non-test (prod) orders
+ */
+
 /* eslint-disable @typescript-eslint/no-var-requires */
 import functions = require('firebase-functions');
 import Stripe from 'stripe';
