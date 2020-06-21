@@ -1,0 +1,83 @@
+const asyncHandler = require("express-async-handler");
+import Joi = require("@hapi/joi");
+import "joi-extract-type";
+import { Request, Response } from "express";
+
+import { orderCollection } from "../database";
+import { getApis } from "../apis";
+
+export const addressSchema = Joi.object({
+  name: Joi.string().required(),
+  address_line1: Joi.string().required(),
+  address_line2: Joi.string().optional(),
+  address_city: Joi.string().required(),
+  address_state: Joi.string().required(),
+  address_zip: Joi.string().required(),
+  address_country: Joi.string().default("US"),
+  email: Joi.string().email(),
+});
+
+export const startPaymentRequestSchema = Joi.object({
+  fromAddress: addressSchema.required(),
+  toAddresses: Joi.array().items(addressSchema).min(1),
+  body: Joi.string().required(),
+  email: Joi.string().email().required(),
+  test: Joi.bool().default(false),
+});
+
+// these extractType<> calls works in typescript 3.8.3, fails in 3.9
+// vscode will complain, but the code will work/compile
+export type Address = Joi.extractType<typeof addressSchema>;
+export type Order = Joi.extractType<typeof startPaymentRequestSchema> & {
+  orderId: string;
+  isTest: boolean;
+};
+export type StartPaymentRequestType = Joi.extractType<typeof startPaymentRequestSchema>;
+
+const StartPayment = asyncHandler(async (req: Request, res: Response) => {
+  // Validate the input
+  const validation = startPaymentRequestSchema.validate(req.body);
+  if (validation.error) {
+    res.status(500).json({ errors: validation.error.details });
+    return;
+  }
+
+  const body = req.body as StartPaymentRequestType;
+  const isTest = body.test;
+
+  // get the apis we're going to use
+  const apis = getApis({ isTest });
+
+  // Pull out a bunch of variables we'll use for the stripe session
+  const host = req.get("origin");
+  const toAddresses = body.toAddresses;
+
+  const orderRef = orderCollection.doc();
+  const orderId = orderRef.id;
+
+  // Create a stripe checkout session corresponding to the orderId
+  // We send the orderId to stripe so it will come back after checkout,
+  // so we can look up the order to execute it
+  // We'll send the stripe sessionId down to the frontend to redirect
+  // to the stripe hosted checkout flow
+  const stripeSession = await apis.stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price: apis.stripePriceId,
+        quantity: (toAddresses || []).length,
+      },
+    ],
+    customer_email: body.email,
+    client_reference_id: orderId,
+    mode: "payment",
+    success_url: `${host}/letterSuccess?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${host}/cancel`,
+  });
+
+  orderRef.set({ ...body, orderId, isTest: isTest || false }).then(() => {
+    res.json({ sessionId: stripeSession.id });
+  });
+});
+
+export default StartPayment;

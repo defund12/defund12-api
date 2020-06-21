@@ -1,0 +1,21 @@
+{
+  "name": "defund12-api",
+  "scripts": {
+    "lint": "cd frontend && npm run lint",
+    "deploy": "firebase deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/defund12.org/defund12-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "husky": {
+    "hooks": {}
+  },
+  "devDependencies": {
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11"
+  }
+}
