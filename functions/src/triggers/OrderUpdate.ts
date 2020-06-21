@@ -84,9 +84,12 @@ const orderUpdateTrigger = functions.firestore
     // ...or the previous value before this update
     const previousValue = change.before.data();
 
+    // if the user hasn't paid yet, don't fulfill this
     // if we already fulfilled this, don't re-execute it
     if (
-      newValue.fulfilled || previousValue.fulfilled
+      !newValue.paid  ||
+      newValue.fulfilled || 
+      previousValue.fulfilled
     ) {
       return true;
     }
