@@ -19,3 +19,26 @@ NOTE:
 - sendgrid to send emails
 - firebase functions to host these "serverless" apis & triggers
 - firebase firestore (database / queue)
+
+## To update API keys
+```
+firebase functions:config:set \
+prod.lob.api_key="XXXX" \
+prod.stripe.api_key="XXXXX" \
+# this one is easy to get confused - it's the PRICE_ID that starts with price_, _not_ the PRODUCT_ID that starts with prod_ which is on the same page
+prod.stripe.price_id="XXXXX" \
+# just for consistency, we set the same sendgrid key in both test and prod
+prod.sendgrid.api_key="XXXXX" 
+
+firebase functions:config:set \
+test.lob.api_key="XXXX" \
+test.stripe.api_key="XXXXX" \
+test.stripe.price_id="XXXXX" \
+test.sendgrid.api_key="XXXXX" 
+```
+
+## To develop
+still to be written
+
+## To deploy
+```npm run deploy```
