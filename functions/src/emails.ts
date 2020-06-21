@@ -1,7 +1,7 @@
-import Lob from "../lob";
-import { sendgrid } from "../apis";
+import { sendgrid } from "./apis";
+import Lob from "./lob";
 
-export function notifyUserOnEmailSend({
+export function notifyUserOnLetterCreate({
   to,
   lobResponses,
 }: {
