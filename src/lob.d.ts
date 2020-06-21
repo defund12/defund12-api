@@ -1,6 +1,6 @@
+/* eslint-disable camelcase */
 export = Lob;
 
-/*~ This example shows how to have multiple overloads for your function */
 declare function Lob(
   apiKey: string,
   options?: {
@@ -118,7 +118,10 @@ declare namespace Lob {
 }
 
 interface LettersApi {
-  create(params: Lob.CreateParams, cb: (err: Error, res: Lob.CreateResponse) => void): any;
+  create(
+    params: Lob.CreateParams,
+    cb: (err: Error, res: Lob.CreateResponse) => void
+  ): void;
 }
 
 interface Lob {

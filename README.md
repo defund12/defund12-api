@@ -54,6 +54,7 @@ To pull down the config variables required to run the functions locally: `cd fun
 ### running locally
 `cd functions && yarn serve`
 
+- 
 - endpoints will be interactable at http://localhost:5001/api/...
 
 ## To deploy

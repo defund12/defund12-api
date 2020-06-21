@@ -1,21 +1,34 @@
 import { Address } from "./lob";
 
-export function makeLetter({
+type MakeLetterHtmlBodyParams = {
+  /** address letter is sent to */
+  toAddress: Address;
+  /** address letter is sent from */
+  fromAddress: Address;
+  /** text body of letter, will be wrapped in salutation & sign off */
+  body: string;
+  /** if true, will call lob in test env, where letter won't actually be sent or charged */
+  isTest: boolean;
+};
+
+/** Generate the html that lob will render into our printed letter
+ * @param {MakeLetterHtmlBodyParams} params input params
+ * @return {string} html body of the letter
+ */
+export function makeLetterHtmlBody({
   toAddress,
   fromAddress,
   body,
-  email,
   isTest,
-}: {
-  toAddress: Address;
-  fromAddress: Address;
-  body: string;
-  email: string;
-  isTest: boolean;
-}): string {
+}: MakeLetterHtmlBodyParams): string {
   const formattedBody = body.replace(/\n/g, "<br/>");
 
-  const options1 = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+  const options1 = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
   const date1 = new Date();
 
   const dateTimeFormat3 = new Intl.DateTimeFormat("en-US", options1);
@@ -92,17 +105,17 @@ export function makeLetter({
 
         <p>Thank you,<br/>
         <span class="signature">${fromAddress.name}</span></p>
-
+nvm 
         <p>
           ${fromAddress.name}<br/>
           <!--${fromAddress.address_line1}, ${fromAddress.address_city}, ${
     fromAddress.address_state
   } ${fromAddress.address_zip}<br/>-->
-          ${email}
+          ${fromAddress.email}
       </div>
     </div>
   </div>
 </body>
 </html>
 `;
-};
+}

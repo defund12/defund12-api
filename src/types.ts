@@ -12,8 +12,12 @@ export const addressSchema = Joi.object({
   email: Joi.string().email(),
 });
 
+export const addressEmailRequiredSchema = Joi.object({
+  email: Joi.string().email().required(),
+}).concat(addressSchema);
+
 export const startPaymentRequestSchema = Joi.object({
-  fromAddress: addressSchema.required(),
+  fromAddress: addressEmailRequiredSchema.required(),
   toAddresses: Joi.array().items(addressSchema).min(1),
   body: Joi.string().required(),
   email: Joi.string().email().required(),

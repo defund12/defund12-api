@@ -5,7 +5,7 @@ import { orderCollection } from "../database";
 import { getApis } from "../apis";
 import { Address, CreateResponse } from "../lob";
 import { notifyUserOnLetterCreate } from "../emails";
-import { makeLetter } from "../letters";
+import { makeLetterHtmlBody } from "../letters";
 
 type SendLetterParams = {
   /** the order */
@@ -26,8 +26,7 @@ async function sendLetter({
   const apis = getApis({ isTest: orderData.test });
 
   return new Promise((resolve, reject) => {
-    const letterHtml = makeLetter({
-      email: orderData.email,
+    const letterHtml = makeLetterHtmlBody({
       toAddress,
       fromAddress: orderData.fromAddress,
       body: orderData.body,
