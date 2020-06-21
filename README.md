@@ -49,7 +49,12 @@ test.stripe.price_id="XXXXX"
 ### initial set up
 Firebase functions requires node 10. `nvm install 10` and `nvm use 10` are your friends here.
 
-To pull down the config variables required to run the functions locally: `firebase functions:config:get > .runtimeconfig.json`
+To pull down the config variables required to run the functions locally: `cd functions && firebase functions:config:get > .runtimeconfig.json`
+
+### running locally
+`cd functions && yarn serve`
+
+- endpoints will be interactable at http://localhost:5001/api/...
 
 ## To deploy
 ```yarn deploy```
