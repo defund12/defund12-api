@@ -5,7 +5,8 @@
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "lint": "cd .. && yarn lint"
   },
   "engines": {
     "node": "10"
@@ -14,10 +15,6 @@
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "@sendgrid/mail": "^7.2.0",
-    "@types/axios": "^0.14.0",
-    "@types/cors": "^2.8.6",
-    "@types/hapi__joi": "^17.1.2",
-    "@types/lodash": "^4.14.155",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -35,7 +32,11 @@
   },
   "devDependencies": {
     "firebase-functions-test": "^0.1.6",
-    "typescript": "3.8.3"
+    "typescript": "3.8.3",
+    "@types/axios": "^0.14.0",
+    "@types/cors": "^2.8.6",
+    "@types/hapi__joi": "^17.1.2",
+    "@types/lodash": "^4.14.155"
   },
   "private": true
 }

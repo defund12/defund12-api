@@ -7,72 +7,72 @@ import { Address, CreateResponse } from "../lob";
 import { notifyUserOnLetterCreate } from "../emails";
 import { makeLetter } from "../letters";
 
-export const markOrderPaid = async (orderId: string) => {
-  console.log("marking order paid", orderId);
-  const docs = await orderCollection.where("orderId", "==", orderId).get();
-  if (docs.empty) {
-    throw new Error("no order with id " + orderId);
-  }
-
-  const order = docs.docs[0];
-
-  const orderPromise = order.ref.update({ paid: true });
-  return orderPromise;
+type SendLetterParams = {
+  /** the order */
+  orderData: Order;
+  /** the address to send to */
+  toAddress: Address;
 };
 
-export const executeOrderId = async (orderId: string) => {
-  console.log("executing order", orderId);
+/**
+ * Send one letter from an order
+ * @param {SendLetterParams} the params
+ * @return {Promise<CreateResponse>} the response from lob
+ */
+async function sendLetter({
+  orderData,
+  toAddress,
+}: SendLetterParams): Promise<CreateResponse> {
+  const apis = getApis({ isTest: orderData.test });
 
-  const docs = await orderCollection.where("orderId", "==", orderId).get();
-  if (docs.empty) {
-    throw new Error("no order with id " + orderId);
-  }
+  return new Promise((resolve, reject) => {
+    const letterHtml = makeLetter({
+      email: orderData.email,
+      toAddress,
+      fromAddress: orderData.fromAddress,
+      body: orderData.body,
+      isTest: orderData.test,
+    });
 
-  const order = docs.docs[0];
-  const orderData: Order = order.data() as Order;
-  return executeOrder(orderData);
-};
+    apis.lob.letters.create(
+      {
+        description: `Letter to ${toAddress.name}`,
+        to: toAddress,
+        from: orderData.fromAddress,
+        file: letterHtml,
+        color: false,
+      },
+      (err: Error, body: CreateResponse) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(body);
+        }
+      }
+    );
+  });
+}
 
-export const executeOrder = async (orderData: Order): Promise<any> => {
+/** Execute (send letters) from an order
+ * @param {Order} orderData the order to execute
+ * @return {Promise<CreateResponse[]>} the lob responses
+ */
+async function executeOrder(orderData: Order): Promise<CreateResponse[]> {
   if (!orderData || !orderData.toAddresses || !orderData.body) {
-    throw new Error("no order with id ");
+    throw new Error("invalid orderData" + JSON.stringify(orderData));
   }
-
-  const apis = getApis({isTest: orderData.test});
 
   const lobPromises = orderData.toAddresses.map((toAddress: Address) => {
-    return new Promise((resolve, reject) => {
-      apis.lob.letters.create(
-        {
-          description: "Demo Letter",
-          to: toAddress,
-          from: orderData.fromAddress,
-          file: makeLetter({
-            email: orderData.email,
-            toAddress,
-            fromAddress: orderData.fromAddress,
-            body: orderData.body,
-            isTest: orderData.test,
-          }),
-          color: false,
-        },
-        (err: any, body: any) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(body);
-          }
-        }
-      );
-    });
+    return sendLetter({ orderData, toAddress });
   });
 
   await orderCollection.doc(orderData.orderId).update({ fulfilled: true });
-  const lobResponses = await Promise.all([...lobPromises]) as CreateResponse[];
-  await notifyUserOnLetterCreate({to: orderData.email, lobResponses});
-  // console.log(lobResponses);
+  const lobResponses = (await Promise.all([
+    ...lobPromises,
+  ])) as CreateResponse[];
+  await notifyUserOnLetterCreate({ to: orderData.email, lobResponses });
   return lobResponses;
-};
+}
 
 const orderUpdateTrigger = functions.firestore
   .document("orders/{orderId}")
@@ -86,11 +86,7 @@ const orderUpdateTrigger = functions.firestore
 
     // if the user hasn't paid yet, don't fulfill this
     // if we already fulfilled this, don't re-execute it
-    if (
-      !newValue.paid  ||
-      newValue.fulfilled || 
-      previousValue.fulfilled
-    ) {
+    if (!newValue.paid || newValue.fulfilled || previousValue.fulfilled) {
       return true;
     }
 

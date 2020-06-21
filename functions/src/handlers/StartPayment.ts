@@ -1,4 +1,4 @@
-const asyncHandler = require("express-async-handler");
+import asyncHandler from "express-async-handler";
 
 import { Request, Response } from "express";
 
@@ -7,7 +7,6 @@ import { getApis } from "../apis";
 import { startPaymentRequestSchema, StartPaymentRequestType } from "../types";
 
 const StartPayment = asyncHandler(async (req: Request, res: Response) => {
-  // Validate the input
   const validation = startPaymentRequestSchema.validate(req.body);
   if (validation.error) {
     res.status(500).json({ errors: validation.error.details });
@@ -17,10 +16,8 @@ const StartPayment = asyncHandler(async (req: Request, res: Response) => {
   const body = req.body as StartPaymentRequestType;
   const isTest = body.test;
 
-  // get the apis we're going to use
   const apis = getApis({ isTest });
 
-  // Pull out a bunch of variables we'll use for the stripe session
   const host = req.get("origin");
   const toAddresses = body.toAddresses;
 

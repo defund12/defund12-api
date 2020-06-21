@@ -21,11 +21,11 @@ export const startPaymentRequestSchema = Joi.object({
 });
 
 export type StartPaymentRequestType = {
-  fromAddress: Lob.Address,
-  toAddresses: Lob.Address[],
-  body: string,
-  email: string,
-  test: boolean,
+  fromAddress: Lob.Address;
+  toAddresses: Lob.Address[];
+  body: string;
+  email: string;
+  test: boolean;
 };
 
 // An order in our database is the incoming order + the fields we need
@@ -34,4 +34,4 @@ export type Order = StartPaymentRequestType & {
   orderId: string;
   paid?: boolean;
   fulfilled?: boolean;
-}
+};
