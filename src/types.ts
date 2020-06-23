@@ -7,7 +7,9 @@ export const addressSchema = Joi.object({
   address_line2: Joi.string().optional(),
   address_city: Joi.string().required(),
   address_state: Joi.string().required(),
-  address_zip: Joi.string().required(),
+  address_zip: Joi.string()
+    .required()
+    .regex(/^[0-9]{5}(?:-[0-9]{4})?$/),
   address_country: Joi.string().default("US"),
   email: Joi.string().email(),
 });
