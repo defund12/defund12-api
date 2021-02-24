@@ -23,13 +23,13 @@ The goal is to keep the cost low and transparent, and the logic relatively simpl
 - At that point, the order is marked paid, and a firestore database trigger is fired, which calls the [lob.com](https://lob.com) API to print and mail the letters.
 - Lob.com sends the letters via first class mail, which are [tracked up until they are sorted at the local post office of delivery](https://support.lob.com/hc/en-us/articles/115000097404-Can-I-track-my-mail-)
 
-NOTE:
+<strong>NOTE:</strong>
 - if an order comes in with test=true (which the frontend generates for localhost urls), we call stripe with test keys (that puts the user into a checkout flow that only accepts fake credit card numbers), and call lob with test keys (that generate letter previews but nothing else) but still call sendgrid with prod keys because we still want to send the user an email to test the whole flow
 
 ### APIs used
-- lob.com to send lettres
+- lob.com to send letters
 - stripe.com to process payments
-- sendgrid to send emails
+- sendgrid.com to send emails
 - firebase functions to host these "serverless" apis & triggers
 - firebase firestore (database / queue)
 
@@ -59,15 +59,14 @@ test.stripe.price_id="XXXXX"
 
 ## To develop
 
-### initial set up
+### Initial set up
 Firebase functions requires node 10. `nvm install 10` and `nvm use 10` are your friends here.
 
 To pull down the config variables required to run the functions locally: `cd functions && firebase functions:config:get > .runtimeconfig.json`
 
-### running locally
+### Running locally
 `cd functions && yarn serve`
 
-- 
 - endpoints will be callable at http://localhost:5001/api/...
 
 ## To deploy
