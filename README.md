@@ -24,7 +24,7 @@ The goal is to keep the cost low and transparent, and the logic relatively simpl
 - Lob.com sends the letters via first class mail, which are [tracked up until they are sorted at the local post office of delivery](https://support.lob.com/hc/en-us/articles/115000097404-Can-I-track-my-mail-)
 
 <strong>NOTE:</strong>
-- if an order comes in with test=true (which the frontend generates for localhost urls), we call stripe with test keys (that puts the user into a checkout flow that only accepts fake credit card numbers), and call lob with test keys (that generate letter previews but nothing else) but still call sendgrid with prod keys because we still want to send the user an email to test the whole flow
+- If an order comes in with test=true (which the frontend generates for localhost urls), we call stripe with test keys (that puts the user into a checkout flow that only accepts fake credit card numbers), and call lob with test keys (that generate letter previews but nothing else) but still call sendgrid with prod keys because we still want to send the user an email to test the whole flow
 
 ### APIs used
 - lob.com to send letters
@@ -67,7 +67,7 @@ To pull down the config variables required to run the functions locally: `cd fun
 ### Running locally
 `cd functions && yarn serve`
 
-- endpoints will be callable at http://localhost:5001/api/...
+- Endpoints will be callable at http://localhost:5001/api/...
 
 ## To deploy
 ```yarn deploy```
